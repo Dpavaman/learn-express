@@ -1,3 +1,4 @@
+const Joi = require("joi");
 const express = require("express"); //returns a function
 
 const app = express(); // :Express --  returns an object of type Express.
@@ -80,10 +81,14 @@ in this case
 //Let's learn app.post()
 
 app.post("/api/courses", (req, res) => {
-  if (!req.body.name || req.body.name.length < 3) {
-    res
-      .status(400)
-      .send("Name is required and should be of minimum 3 characters");
+  const schema = Joi.object({
+    name: Joi.string().min(3).required(),
+  });
+
+  const validationResult = schema.validate(req.body);
+
+  if (validationResult.error) {
+    res.status(400).send(validationResult.error.details[0].message);
     return;
   }
   const course = {
