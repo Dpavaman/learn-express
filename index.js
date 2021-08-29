@@ -80,6 +80,12 @@ in this case
 //Let's learn app.post()
 
 app.post("/api/courses", (req, res) => {
+  if (!req.body.name || req.body.name.length < 3) {
+    res
+      .status(400)
+      .send("Name is required and should be of minimum 3 characters");
+    return;
+  }
   const course = {
     id: courses.length + 1, //this is not the right way of assigning id, this would make a duplicate id if any item in between is deleted
     name: req.body.name, //assuming request body has an object which contains name of the course that is being added to courses
