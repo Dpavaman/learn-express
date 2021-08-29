@@ -6,10 +6,18 @@ const app = express(); // :Express --  returns an object of type Express.
 app.use(express.json()); //this has to be enabled in order to parse the items being sent through the body object of request.
 
 const courses = [
-  { id: 1, course: "course 1" },
-  { id: 2, course: "course 2" },
-  { id: 3, course: "course 3" },
+  { id: 1, name: "course 1" },
+  { id: 2, name: "course 2" },
+  { id: 3, name: "course 3" },
 ];
+
+function validateCourse(course) {
+  const schema = Joi.object({
+    name: Joi.string().min(3).required(),
+  });
+
+  return schema.validate(course);
+}
 
 /*
 
@@ -81,11 +89,7 @@ in this case
 //Let's learn app.post()
 
 app.post("/api/courses", (req, res) => {
-  const schema = Joi.object({
-    name: Joi.string().min(3).required(),
-  });
-
-  const validationResult = schema.validate(req.body);
+  const validationResult = validateCourse(req.body);
 
   if (validationResult.error) {
     res.status(400).send(validationResult.error.details[0].message);
@@ -96,6 +100,35 @@ app.post("/api/courses", (req, res) => {
     name: req.body.name, //assuming request body has an object which contains name of the course that is being added to courses
   };
   courses.push(course);
+  res.send(courses);
+});
+
+// Let's learn app.put()
+
+app.put("/api/courses/:id", (req, res) => {
+  //Look up for the course with specified id
+  // if course doesn't exist, return 404 (resource not found)
+
+  const course = courses.find(
+    (course) => course.id === parseInt(req.params.id)
+  );
+  if (!course) {
+    res.status(404).send("Requested course is not available");
+    return;
+  }
+
+  // else Validate
+  // if Invalid, return 400 (Bad request),
+
+  const validationResult = validateCourse(req.body);
+  if (validationResult.error) {
+    res.status(400).send(validationResult.details[0].message);
+    return;
+  }
+
+  //if Valid, update the course and acknowledge the client on updation
+
+  course.name = req.body.name;
   res.send(courses);
 });
 
