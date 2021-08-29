@@ -2,6 +2,8 @@ const express = require("express"); //returns a function
 
 const app = express(); // :Express --  returns an object of type Express.
 
+app.use(express.json()); //this has to be enabled in order to parse the items being sent through the body object of request.
+
 const courses = [
   { id: 1, course: "course 1" },
   { id: 2, course: "course 2" },
@@ -74,6 +76,17 @@ to access these queries, use "req.query" which will return an object of all the 
 in this case
 
 */
+
+//Let's learn app.post()
+
+app.post("/api/courses", (req, res) => {
+  const course = {
+    id: courses.length + 1, //this is not the right way of assigning id, this would make a duplicate id if any item in between is deleted
+    name: req.body.name, //assuming request body has an object which contains name of the course that is being added to courses
+  };
+  courses.push(course);
+  res.send(courses);
+});
 
 // Below code corresponds to the listening of this app.
 // on hosting the port can be assigned dynamically, thus process.env.PORT || 3000 is used below
