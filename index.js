@@ -122,13 +122,33 @@ app.put("/api/courses/:id", (req, res) => {
 
   const validationResult = validateCourse(req.body);
   if (validationResult.error) {
-    res.status(400).send(validationResult.details[0].message);
+    res.status(400).send(validationResult.error.details[0].message);
     return;
   }
 
   //if Valid, update the course and acknowledge the client on updation
 
   course.name = req.body.name;
+  res.send(courses);
+});
+
+// Let's learn app.delete()
+
+app.delete("/api/courses/:id", (req, res) => {
+  // Look for the course wuth the specified id
+  // if course doesn'r exists, return 404 (resource not found)
+  const course = courses.find(
+    (course) => course.id === parseInt(req.params.id)
+  );
+  if (!course) {
+    res.status(404).send("The course you requested was not found");
+    return;
+  }
+
+  //if exists, delete the course and acknowledge the client
+  const index = courses.indexOf(course);
+  courses.splice(index, 1);
+
   res.send(courses);
 });
 
