@@ -2,6 +2,12 @@ const express = require("express"); //returns a function
 
 const app = express(); // :Express --  returns an object of type Express.
 
+const courses = [
+  { id: 1, course: "course 1" },
+  { id: 2, course: "course 2" },
+  { id: 3, course: "course 3" },
+];
+
 /*
 
 this app Object has a bunch of useful methods such as 
@@ -22,14 +28,21 @@ app.get("/", (req, res) => {
 
 //This is another endpoint, when hit, it will provide the details of the courses available on the database.
 app.get("/api/courses", (req, res) => {
-  res.send("This page will have the details of the available courses");
+  res.send(courses);
 });
 
 //req.params will return an object that contains all the available route parameters, in our case it is "id"
 //let's send the route paramater back as a response so that it verifies we are fetching the right parameter
 
 app.get("/api/courses/:id", (req, res) => {
-  res.send(req.params.id);
+  const course = courses.find(
+    (course) => course.id === parseInt(req.params.id)
+  );
+  if (!course) {
+    res.status(404).send("The course you requested doesn'e exist");
+  } else {
+    res.send(course);
+  }
 });
 /* 
 this is known as a route parameter, 
